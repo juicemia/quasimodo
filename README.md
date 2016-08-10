@@ -23,4 +23,4 @@ aws_access_key_id = <QUASIMODO'S ACCESS KEY>
 aws_secret_access_key = <QUASIMODO'S SECRET KEY>
 ```
 
-With the above, just navigate to your Hugo site's project directory (not public) and run `quasimodo`. He'll build your site for you and push it to S3.
+With the above, just navigate to your Hugo site's project directory (not public) and run `quasimodo --bucket example.com`. He'll build your site for you and push it to S3.
