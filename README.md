@@ -8,7 +8,7 @@ write a little go tool to make my uploads easy.
 
 ## Requirements
 
-1. `hugo` must be in your `$PATH`. `quasimodo` uses the hugo command to generate your site
+1. `hugo` must be in your `$PATH`. `quasimodo` uses the hugo command to generate your site.
 
 1. `quasimodo` needs its own user with access to your S3 bucket. You can create a new user
 for this purpose using Identity and Access Management (IAM) in the AWS console. All he needs
