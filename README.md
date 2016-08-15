@@ -24,3 +24,7 @@ aws_secret_access_key = <QUASIMODO'S SECRET KEY>
 ```
 
 With the above, just navigate to your Hugo site's project directory (not public) and run `quasimodo --bucket example.com`. He'll build your site for you and push it to S3.
+
+`quasimodo` can invalidate your cloudfront cache for you. This is useful if you're using CloudFront to provide HTTPS.
+To invalidate the cache, pass the distribution ID to `--cloudfront-id`. It will trigger the invalidation, which may
+take some time to complete. See AWS docs for more details on CloudFront invalidations. 
