@@ -17,10 +17,11 @@ func init() {
 }
 
 func main() {
-	var bucket, region string
+	var bucket, region, cache string
 
 	flag.StringVar(&region, "region", "us-east-1", "the region containing the s3 bucket")
 	flag.StringVar(&bucket, "bucket", "", "the bucket hosting the site")
+	flag.StringVar(&cache, "cloudfront-id", "", "the id of the cloudfront distribution serving for the bucket")
 
 	flag.Parse()
 
@@ -39,7 +40,15 @@ func main() {
 
 	fmt.Println("getting aws credentials and opening session")
 
-	svc, err := amazon.NewS3Session(region, bucket)
+	svc, err := amazon.NewService(region, bucket)
+	if err != nil {
+		fmt.Printf("error creating s3 session: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("checking bucket website configuration")
+
+	err = svc.CheckWWW()
 	if err != nil {
 		fmt.Printf("error creating s3 session: %v\n", err)
 		os.Exit(1)
@@ -59,5 +68,17 @@ func main() {
 	if err != nil {
 		fmt.Printf("error publishing site: %v\n", err)
 		os.Exit(1)
+	}
+
+	if len(cache) != 0 {
+		fmt.Println("invalidating cloudfront")
+
+		err = svc.BustCache(cache)
+		if err != nil {
+			fmt.Printf("error invalidating cloudfront: %v\n", err)
+			os.Exit(1)
+		}
+
+		fmt.Println("cloudfront invalidation triggered (could take some time)")
 	}
 }

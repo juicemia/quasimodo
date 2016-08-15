@@ -10,12 +10,14 @@ import (
 // and clears it out. In AWS there's no way to just clear a
 // bucket. We have to list out all the objects in the bucket
 // and send delete requests for each one.
-func (s *S3) Clean() error {
+func (s *Service) Clean() error {
+	svc := *s3.New(s.session)
+
 	lsRequest := &s3.ListObjectsInput{
 		Bucket: aws.String(s.Bucket),
 	}
 
-	lsResponse, err := s.ListObjects(lsRequest)
+	lsResponse, err := svc.ListObjects(lsRequest)
 	if err != nil {
 		return err
 	}
@@ -35,7 +37,7 @@ func (s *S3) Clean() error {
 			},
 		}
 
-		_, err = s.DeleteObjects(deleteRequest)
+		_, err = svc.DeleteObjects(deleteRequest)
 		if err != nil {
 			return err
 		}
@@ -45,7 +47,9 @@ func (s *S3) Clean() error {
 }
 
 // Publish uploads the hugo site's public folder to the S3 bucket.
-func (s *S3) Publish() error {
+func (s *Service) Publish() error {
+	svc := *s3.New(s.session)
+
 	f, err := fs.GetSite()
 	if err != nil {
 		return err
@@ -57,10 +61,27 @@ func (s *S3) Publish() error {
 	}
 
 	for _, req := range uploadRequests {
-		_, err := s.PutObject(req)
+		_, err := svc.PutObject(req)
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+// CheckWWW checks the Bucket's website configuration. If the bucket
+// isn't configured as a server, it will return an error.
+func (s *Service) CheckWWW() error {
+	svc := *s3.New(s.session)
+
+	wwwConfigRequest := &s3.GetBucketWebsiteInput{
+		Bucket: aws.String(s.Bucket),
+	}
+
+	_, err := svc.GetBucketWebsite(wwwConfigRequest)
+	if err != nil {
+		return err
 	}
 
 	return nil
